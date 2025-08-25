@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+    --dedault-background: #161717;
+    --default-text-color: white;
+}
+
+body {
+    box-sizing: border-box;
+    margin: 0;
+    background-color: var(--dedault-background);
+    color: var(--default-text-color);
+}

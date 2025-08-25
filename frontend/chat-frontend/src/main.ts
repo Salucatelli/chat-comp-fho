@@ -1,10 +1,13 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
+import { HomeComponent } from './app/home/home.component';
 import { AppComponent } from './app/app.component';
-import { ChatComponent } from './app/chat/chat.component';
+import { routes } from './app/app.routes';
+import { provideRouter } from '@angular/router';
 
-// bootstrapApplication(AppComponent, appConfig)
-//   .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+}).catch((err) => console.error(err));
 
-bootstrapApplication(ChatComponent)
-  .catch(err => console.error(err));
+//bootstrapApplication(AppComponent, appConfig)
+//  .catch (err => console.error(err));

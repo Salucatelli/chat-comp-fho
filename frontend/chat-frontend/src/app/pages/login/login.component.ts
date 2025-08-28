@@ -27,8 +27,11 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
-        next: () => this.router.navigate(['/home']),
-        error: (err) => (this.errorMessage = err.error?.error || 'Falha no login'),
+        next: () => this.router.navigate(['/']),
+        error: (err) => {
+          alert(err.error.error || "erro");
+          (this.errorMessage = err.error?.error || 'Falha no login');
+        }
       });
     }
   }

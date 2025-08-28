@@ -1,0 +1,46 @@
+.navigation-bar{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    position: relative;
+}
+
+.input{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-menu{
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: 15px;
+    padding-right: 150px;
+}
+
+.nav-button {
+    background-color: var(--secondary-color);
+}
+
+.navbar {
+    padding: 10px;
+}
+
+.nav-div{
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.profile-picture-nav-bar{
+
+    justify-content: flex-end;
+
+}
+
+.profile-picture-nav-bar img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}

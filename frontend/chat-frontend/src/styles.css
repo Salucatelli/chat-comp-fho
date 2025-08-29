@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
-    --primary-background: #28292A;
+    --primary-background: #0D1117;
+    --secondary-background: #010409;
     --secondary-color: #091DFA;
     --default-text-color: white;
 }

@@ -1,0 +1,28 @@
+<nav class="navigation-bar">
+    <div class="nav-div">
+        <img src="logo_kaduu.ico" alt="kaduu" width="70" height="70" (click)="goToHome()" class="logo">
+    </div>
+
+    <div class="nav-menu nav-div">
+        <div class="btn-secondary-color btn btn-primary flex-fill" (click)="goToHome()">Home</div>
+        <div class="btn-secondary-color btn btn-primary flex-fill" (click)="goToChat()">Chat</div>
+    </div>
+
+    <!-- <div class="nav-div input">
+        <input type="text" class="form-control" placeholder="Search">
+    </div> -->
+
+    @if (isLoggedIn){
+    <div class="profile-picture-nav-bar nav-div">
+        <img src="https://i.pinimg.com/736x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg" alt="Profile picture"
+            id="profile-picture-nav-bar">
+        <button class="btn btn-primary btn-secondary-color" (click)="logout()"> Sair</button>
+    </div>
+    }
+    @else {
+    <div class="login-button">
+        <button class="btn btn-primary btn-secondary-color" (click)="goToChat()">Login</button>
+    </div>
+    }
+
+</nav>

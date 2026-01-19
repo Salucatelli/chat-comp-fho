@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: comp-chat-fho-db
+    restart: always
+    environment:
+      POSTGRES_USER: salucatelli
+      POSTGRES_PASSWORD: Familiaadans
+      POSTGRES_DB: chat-comp-fho
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,0 +1,29 @@
+.login-main-div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    overflow-y: hidden;
+}
+
+.login-card{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-elevated);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    width: 35%;
+    gap: 15px;
+}
+
+.input-div{
+    display: flex;
+    flex-direction: column;
+
+    gap: 25px;
+    width:60%;
+}

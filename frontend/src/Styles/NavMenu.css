@@ -1,0 +1,21 @@
+.main-div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    border-bottom: var(--border-default) solid 5px;
+    background-color: var(--bg-surface-opacity-50);
+
+}
+
+.right-div{
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: space-around;
+}
+
+.main-div a{
+    text-decoration: none;
+}

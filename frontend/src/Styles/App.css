@@ -1,0 +1,103 @@
+:root {
+  /* ===== Brand / Primary ===== */
+  --color-primary: #3b82f6;   /* Azul principal */
+  --color-primary-hover: #2563eb;
+  --color-primary-active: #1d4ed8;
+
+  /* ===== Backgrounds ===== */
+  --bg-body: #0f172a;   /* Fundo geral (azul bem escuro) */
+  --bg-surface: #020617;   /* Cards, modais */
+  --bg-surface-hover: #020617;
+  --bg-elevated: #1e293b;   /* Hover / destaque */
+
+  /* ===== Text ===== */
+  --text-primary: #e5e7eb;   /* Texto principal */
+  --text-secondary: #94a3b8;   /* Texto secundário */
+  --text-muted: #64748b;   /* Placeholder / hint */
+  --text-inverse: #020617;   /* Texto em botão azul */
+
+  /* ===== Borders ===== */
+  --border-default: #1e293b;
+  --border-focus: var(--color-primary);
+
+  /* ===== States ===== */
+  --color-success: #22c55e;
+  --color-warning: #facc15;
+  --color-danger: #ef4444;
+  --color-info: #38bdf8;
+
+  /* ===== Shadows ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.6);
+
+  /* ===== Radius ===== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ===== Spacing ===== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+
+  /* ===== Transitions ===== */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+
+  /* ===== Opacidades ===== */
+  --opacity-25: 0.25;
+  --opacity-50: 0.5;
+  --opacity-75: 0.75;
+  --bg-surface-opacity-50: rgba(2, 6, 23, 0.5);
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body{
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+}
+
+/* Estilo dos links */
+a{
+  color: white;
+}

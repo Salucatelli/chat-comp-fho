@@ -16,7 +16,7 @@ export const register = async (req: Request, res: Response) => {
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
         if (existingUser) {
-            return res.status(409).json({ error: "Email já cadastrado" });
+            return res.status(409).json({ message: "Email já cadastrado" });
         }
 
         // Criptografa a senha
@@ -34,27 +34,26 @@ export const register = async (req: Request, res: Response) => {
 
         res.status(201).json({ message: "Usuário criado com sucesso!", user: { id: newUser.id, email: newUser.email } });
     } catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({ message: error });
     }
 }
 
 // Login ass a existing user
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
+    //console.log("email e senha: " + email, password);
     try {
-
         // Procura o usuario na tabela
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
-            return res.status(404).json({ error: "Usuário não encontrado" });
+            return res.status(404).json({ message: "Usuário não encontrado" });
         }
 
         // Verifica se a senha bate
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-            return res.status(401).json({ error: "Email ou senha inválidos" });
+            return res.status(401).json({ message: "Email ou senha inválidos" });
         }
 
         // Gera o token
@@ -66,7 +65,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: "Login bem sucedido!", token });
     } catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({ message: error });
         console.log(error);
     }
 }

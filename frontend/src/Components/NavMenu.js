@@ -5,7 +5,7 @@ import '../Styles/NavMenu.css'
 export default function NavMenu() {
     return (
         <div className="main-div">
-            <div clallName="title-div">
+            <div className="title-div">
                 <h2>Título</h2>
             </div>
             <div className="right-div">
@@ -18,6 +18,9 @@ export default function NavMenu() {
                 </Link>
                 <Link to="/register">
                     <h4>Registrar</h4>
+                </Link>
+                <Link to="/profile">
+                    <h4>Perfil</h4>
                 </Link>
 
             </div>

@@ -5,7 +5,7 @@ import cors from "cors";
 const app = express();
 
 const corsOptions = {
-    origin: 'http://localhost:4200', // Allow requests only from this origin
+    origin: 'http://localhost:3001', // Allow requests only from this origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed HTTP methods
     credentials: true, // Allow sending cookies/authentication headers
     optionsSuccessStatus: 200 // Some legacy browsers choke on 204

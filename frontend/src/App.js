@@ -5,8 +5,10 @@ import NavMenu from './Components/NavMenu';
 import Home from './Components/Home';
 import Infos from './Components/Infos';
 import Login from './Components/Login';
+import Profile from './Components/Profile'
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import PrivateRoute from './Components/PrivateRoute';
 
 
 function App() {
@@ -20,6 +22,13 @@ function App() {
 
                     {/* Esse Id vai ser um parâmetro da rota */}
                     <Route path="/infos/:id" exact element={<Infos />} />
+
+                    {/* Essa rota é privada */}
+                    <Route path="/profile" exact element={
+                        <PrivateRoute>
+                            <Profile />
+                        </PrivateRoute>
+                    } />
 
                     <Route path="/login" exact element={<Login />} />
 

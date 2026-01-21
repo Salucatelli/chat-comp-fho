@@ -44,7 +44,9 @@ export const login = async (req: Request, res: Response) => {
     //console.log("email e senha: " + email, password);
     try {
         // Procura o usuario na tabela
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
 
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
@@ -63,7 +65,13 @@ export const login = async (req: Request, res: Response) => {
             { expiresIn: '1h' } // Token expira em 1 hora
         );
 
-        res.status(200).json({ message: "Login bem sucedido!", token });
+        const returningUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        };
+
+        res.status(200).json({ message: "Login bem sucedido!", token, user: returningUser });
     } catch (error) {
         res.status(500).json({ message: error });
         console.log(error);

@@ -7,34 +7,32 @@ import Infos from './Components/Infos';
 import Login from './Components/Login';
 import Profile from './Components/Profile'
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import PrivateRoute from './Components/PrivateRoute';
 
 
 function App() {
     return (
         <div className="App">
-            <BrowserRouter>
-                <NavMenu />
+            <NavMenu />
 
-                <Routes>
-                    <Route path="/" exact element={<Home />} />
+            <Routes>
+                <Route path="/" exact element={<Home />} />
 
-                    {/* Esse Id vai ser um parâmetro da rota */}
-                    <Route path="/infos/:id" exact element={<Infos />} />
+                {/* Esse Id vai ser um parâmetro da rota */}
+                <Route path="/infos/:id" exact element={<Infos />} />
 
-                    {/* Essa rota é privada */}
-                    <Route path="/profile" exact element={
-                        <PrivateRoute>
-                            <Profile />
-                        </PrivateRoute>
-                    } />
+                {/* Essa rota é privada */}
+                <Route path="/profile" exact element={
+                    <PrivateRoute>
+                        <Profile />
+                    </PrivateRoute>
+                } />
 
-                    <Route path="/login" exact element={<Login />} />
+                <Route path="/login" exact element={<Login />} />
 
-                    <Route path="*" element={<h1>Rota não encontrada</h1>} />
-                </Routes>
-            </BrowserRouter>
+                <Route path="*" element={<h1>Rota não encontrada</h1>} />
+            </Routes>
         </div>
     );
 }

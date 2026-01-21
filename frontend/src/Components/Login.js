@@ -2,8 +2,10 @@ import '../Styles/Login.css'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tryLogin } from '../Services/LoginService';
+import { useAuth } from '../auth/useAuth';
 
 export default function Login() {
+    const { login } = useAuth();
 
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -16,8 +18,11 @@ export default function Login() {
 
         // Se login bem sucedido, vai para profile
         if (response.success) {
-            console.log(response);
+            //console.log(response);
             localStorage.setItem('token', response.token);
+            login(response.token, response.user);
+            console.log("login chamado com:", response.user);
+
             navigate("/profile");
         } else {
             setError(response.message);

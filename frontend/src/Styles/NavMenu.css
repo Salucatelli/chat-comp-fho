@@ -6,7 +6,7 @@
     padding: 10px 40px;
     border-bottom: var(--border-default) solid 5px;
     background-color: var(--bg-surface-opacity-50);
-
+    height: 10vh;
 }
 
 .right-div{

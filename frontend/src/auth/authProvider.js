@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
         }
     }
 
-    console.log("AuthProvider render, user:", user);
+    //console.log("AuthProvider render, user:", user);
 
     useEffect(() => {
         loadUser();

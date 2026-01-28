@@ -12,8 +12,24 @@ export async function Login(email, password) {
     return {
         success: response.ok,
         message: json.message,
-        token: json.token
+        token: json.token,
+        user: json.user
     };
+}
+
+export async function Register(email, password, name) {
+    const response = await apiFetch("/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password, name })
+    });
+
+    const json = await response.json();
+
+    if (response.status !== 201) {
+        return { success: false, ...json };
+    }
+
+    return { success: response.ok, ...json };
 }
 
 export async function getProfile() {

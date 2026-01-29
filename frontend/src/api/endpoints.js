@@ -43,3 +43,9 @@ export async function getUserProfile() {
     const response = await apiFetch("/me");
     return response.json();
 }
+
+export async function getAllContacts() {
+    const response = await apiFetch("/allContacts");
+    //console.log(response);
+    return response.json();
+}

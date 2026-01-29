@@ -1,5 +1,6 @@
 import express from "express";
 import authRoutes from "./routes/authRoutes";
+import chatRoutes from "./routes/chatRoutes";
 import cors from "cors";
 
 const app = express();
@@ -14,6 +15,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-app.use("/", authRoutes)
+app.use("/", authRoutes);
+app.use("/", chatRoutes);
 
 export default app;

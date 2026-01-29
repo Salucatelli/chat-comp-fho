@@ -37,7 +37,7 @@ export default function Home() {
                     </div>
                 </div>
             ) : (
-                <Chat></Chat>
+                <Chat user={user}></Chat>
             )}
         </div>
 

@@ -52,3 +52,28 @@ background-color: var(--bg-surface-hover);
     border-top: var(--border-default) solid 1px;
     flex-shrink: 0;
 }
+
+.message-item{
+    max-width: 70%;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    background-color: blueviolet;
+}
+
+.message-line{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 5px 10px;
+}
+
+.message-mine{
+    justify-content: flex-end;
+    /* flex-direction: row-reverse; */
+}

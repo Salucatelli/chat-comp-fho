@@ -49,3 +49,17 @@ export async function getAllContacts() {
     //console.log(response);
     return response.json();
 }
+
+export async function getSomething(url) {
+    const response = await apiFetch(url);
+    //console.log(response);
+    return response.json();
+}
+
+export async function postSometing(url, object) {
+    const response = await apiFetch(url, {
+        method: "POST",
+        body: JSON.stringify(object)
+    });
+    return response.json();
+}

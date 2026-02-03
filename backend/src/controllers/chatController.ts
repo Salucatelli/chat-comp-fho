@@ -36,3 +36,44 @@ export const getAllContacts = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Contatos obtidos com sucesso!", contacts: contacts });
 }
 
+export const getAllConversations = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    const contacts = await prisma.conversation.findMany({
+        select: {
+            id: true,
+            title: true,
+            isGroup: true
+        }, where: {
+            participants: {
+                some: {
+                    userId: userId
+                }
+            }
+        }
+    })
+
+    res.status(200).json({ message: "Conversas obtidos com sucesso!", conversations: contacts });
+}
+
+export const createConversation = async (req: Request, res: Response) => {
+    const { title, contact1, contact2 } = req.body;
+
+    //console.log(contact1, contact2);
+
+    var conv = await prisma.conversation.create({
+        data: {
+            title,
+            isGroup: false,
+            participants: {
+                create: [
+                    { userId: contact1 },
+                    { userId: contact2 }
+                ]
+            }
+        }
+    });
+
+    res.status(200).json({ message: "Conversa criada com sucesso!", conv });
+}
+

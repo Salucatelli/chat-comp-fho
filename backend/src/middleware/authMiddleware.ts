@@ -19,7 +19,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    console.log(token);
+    //console.log(token);
 
     if (token == null) {
         return res.sendStatus(401); // Unauthorized

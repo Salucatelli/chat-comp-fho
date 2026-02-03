@@ -10,5 +10,6 @@
     "declaration": true,
     "declarationMap": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["src", "src/@types"]
 }

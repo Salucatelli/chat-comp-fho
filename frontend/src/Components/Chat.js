@@ -1,25 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { socket } from "../Services/socketService";
 import '../Styles/Chat.css'
-import { getContactsService } from "../Services/chatService";
+import { getContactsService, getConversationsService, postMethod } from "../Services/chatService";
 
 // Lista de contatos temporária
 
 
 export default function Chat({ user }) {
 
-    const [userContact, setUserContact] = useState({});
+    //const [userContact, setUserContact] = useState({});
+    const [currentConversation, setCurrentConversation] = useState({});
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState("");
     const [contacts, setContacts] = useState([]);
+    const [conversations, setConversations] = useState([]);
 
     async function getContacts() {
         var c = (await getContactsService());
         setContacts(c.contacts.filter(c => c.id !== user.id));
     }
 
+    async function addContact(c) {
+        const conversa = conversations.find(conversation => conversation.id === c.id);
+
+        if (!conversa) {
+            console.log("Não tem uma conversation");
+            const res = await postMethod("/createConversation", { title: `${user.name}-${c.name}`, contact1: c.id, contact2: user.id });
+
+            setCurrentConversation(res.conv);
+
+            console.log("resposta: ", res);
+        } else {
+
+        }
+    }
+
+    async function selectConversation(c) {
+        if (currentConversation != null) {
+            socket.emit("leaveConversation", currentConversation.id);
+        }
+
+        socket.emit("joinConversation", c.id);
+        setCurrentConversation(c);
+    }
+
+    async function getConversations() {
+        const id = user.id;
+
+        var c = (await getConversationsService(id));
+        setConversations(c.conversations);
+    }
+
     useEffect(() => {
         getContacts();
+        getConversations();
 
         socket.connect();
 
@@ -31,23 +65,14 @@ export default function Chat({ user }) {
             console.log("desconectado"); // false
         });
 
-        // socket.on("chatMessage", (data) => {
-        //     if (data.to !== user.id) return;
-
-        //     setMessages((prevMessages) => [...prevMessages, data.message]);
-        // });
-
-        // return () => {
-        //     socket.off("Saiu da página");
-        //     socket.disconnect();
-        // };
     }, []);
 
     // useEffect para mensagens
     useEffect(() => {
         const handleChatMessage = (data) => {
-            if (data.to !== user.id) return;
 
+            if (data.sender.id === user.id) return;
+            console.log("mensagem recebida: ", data.message);
             setMessages((prev) => [...prev, data]);
         };
 
@@ -59,7 +84,6 @@ export default function Chat({ user }) {
     }, [user.id]);
 
 
-
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             sendMessage();
@@ -69,10 +93,10 @@ export default function Chat({ user }) {
     function sendMessage() {
         if (messageInput === "") return;
 
-        let newMessage = { message: messageInput, to: userContact.id, sender: user }
+        let newMessage = { message: messageInput, to: currentConversation.id, sender: user }
 
         socket.emit("chatMessage", newMessage);
-        console.log("contato: ", userContact);
+        //console.log("contato: ", userContact);
         setMessages([...messages, newMessage]);
         setMessageInput("");
     }
@@ -82,31 +106,62 @@ export default function Chat({ user }) {
         setMessages([]);
     }
 
-    function changeContact(c) {
-        setUserContact(c);
-    }
+    // async function changeContact(c) {
+    //     // const conversa = conversations.find(conversation => conversation.id === c.id);
+
+    //     // if (!conversa) {
+    //     //     console.log("Não tem uma conversation");
+    //     //     const res = await postMethod("/createConversation", { title: "teste", contact1: c.id, contact2: user.id });
+
+    //     //     console.log("resposta: ", res);
+    //     // };
+
+    //     setUserContact(c);
+    // }
 
     // Sempre que o contato for atualizado, ele atualiza as mensagens
-    useEffect(() => {
-        getMessages(userContact);
-    }, [userContact]);
+    // useEffect(() => {
+    //     getMessages(userContact);
+    // }, [userContact]);
 
 
     return (<div className="chat-container">
         {/* Menu lateral com os contatos */}
         <div className="left-menu">
-            <h2>Contatos</h2>
-            <div className="contact-list">
-                {contacts.map((c) =>
-                    <div className="contact-item" key={c.id} onClick={() => changeContact(c)}>{c.name}</div>
-                )}
+            {/* <div>
+                <h2>Contatos</h2>
+                <div className="contact-list">
+                    {contacts.map((c) =>
+                        <div className="contact-item" key={c.id} onClick={async () => await changeContact(c)}>{c.name}</div>
+                    )}
+                </div>
+            </div> */}
+
+            <div>
+                <h2>Conversas</h2>
+                <div className="contact-list">
+                    {conversations.map((c) =>
+                        <div className="contact-item" key={c.id} onClick={() => selectConversation(c)}>{c.title}</div>
+                    )}
+                </div>
+            </div>
+
+            <br></br>
+
+            <div>
+                <h2>Contatos para adicionar</h2>
+                <div className="contact-list">
+                    {contacts.map((c) =>
+                        <div className="contact-item" key={c.id} onClick={async () => await addContact(c)}>{c.name}</div>
+                    )}
+                </div>
             </div>
         </div>
 
-        {userContact ? (
+        {Object.keys(currentConversation).length !== 0 ? (
             <div className="main-chat">
                 <div className="contact-info">
-                    <h2>{userContact ? userContact.name : "Contato"}</h2>
+                    <h2>{currentConversation ? currentConversation.title : "Contato"}</h2>
                 </div>
 
                 {/* Campo com as mensagens */}
@@ -139,7 +194,7 @@ export default function Chat({ user }) {
                     ><i className="bi bi-send"></i></button>
                 </div>
             </div>
-        ) : ""}
+        ) : <div><h3>Selecione um contato</h3></div>}
 
     </div>)
 }

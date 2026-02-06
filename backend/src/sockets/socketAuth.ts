@@ -2,7 +2,8 @@ import { Server, Socket } from "socket.io";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface TokenPayload extends JwtPayload {
-    sub: string;
+    id?: string;
+    sub?: string;
     email: string;
 }
 
@@ -21,7 +22,7 @@ export function socketAuth(io: Server): void {
             ) as TokenPayload;
 
             socket.user = {
-                id: decoded.sub,
+                id: decoded.id as string,
                 email: decoded.email,
             };
 

@@ -3,12 +3,8 @@ import { socket } from "../Services/socketService";
 import '../Styles/Chat.css'
 import { getContactsService, getConversationsService, postMethod } from "../Services/chatService";
 
-// Lista de contatos temporária
-
-
 export default function Chat({ user }) {
 
-    //const [userContact, setUserContact] = useState({});
     const [currentConversation, setCurrentConversation] = useState({});
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState("");
@@ -39,9 +35,8 @@ export default function Chat({ user }) {
         if (currentConversation != null) {
             socket.emit("leaveConversation", currentConversation.id);
         }
-
-        socket.emit("joinConversation", c.id);
         setCurrentConversation(c);
+        socket.emit("joinConversation", c.id);
     }
 
     async function getConversations() {
@@ -51,6 +46,17 @@ export default function Chat({ user }) {
         setConversations(c.conversations);
     }
 
+
+    //=============================== TODO ========================================
+    // - Salvar as mensagens no banco de dados
+    // - Carregar as mensagens do banco de dados quando abrir um chat
+    // - Configurar a notificação para quando não estiver com o chat aberto 
+    // - Criar um menuzinho para adicionar contatos novos 
+    // - Opção para criar um grupo
+    //=============================================================================
+
+
+    // useEffect para conectar ao socket e carregar conversas
     useEffect(() => {
         getContacts();
         getConversations();
@@ -67,7 +73,7 @@ export default function Chat({ user }) {
 
     }, []);
 
-    // useEffect para mensagens
+    // useEffect para receber mensagens e notificações
     useEffect(() => {
         const handleChatMessage = (data) => {
 
@@ -83,13 +89,26 @@ export default function Chat({ user }) {
         };
     }, [user.id]);
 
+    // useEffect para atualizar quando mudar o current conversation
+    useEffect(() => {
+        const handleNotification = (data) => {
+            //console.log(data);
+            // console.log("Id da conversa atual: ", currentConversation.id);
+            // console.log("Id da notificação: ", data.to);
+        }
 
+        socket.on("chatNotification", handleNotification);
+        return () => socket.off("chatNotification", handleNotification);
+    }, [currentConversation]);
+
+    // Detectar que clicou no enter
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             sendMessage();
         }
     }
 
+    // Enviar uma mensagem
     function sendMessage() {
         if (messageInput === "") return;
 
@@ -128,14 +147,6 @@ export default function Chat({ user }) {
     return (<div className="chat-container">
         {/* Menu lateral com os contatos */}
         <div className="left-menu">
-            {/* <div>
-                <h2>Contatos</h2>
-                <div className="contact-list">
-                    {contacts.map((c) =>
-                        <div className="contact-item" key={c.id} onClick={async () => await changeContact(c)}>{c.name}</div>
-                    )}
-                </div>
-            </div> */}
 
             <div>
                 <h2>Conversas</h2>
@@ -158,6 +169,7 @@ export default function Chat({ user }) {
             </div>
         </div>
 
+        {/* Chat Principal */}
         {Object.keys(currentConversation).length !== 0 ? (
             <div className="main-chat">
                 <div className="contact-info">
@@ -167,8 +179,8 @@ export default function Chat({ user }) {
                 {/* Campo com as mensagens */}
                 <div className="messages-field">
                     {messages.map((m, index) =>
-                        <div className={`message-line ${m.sender.id === user.id ? "message-mine" : ""}`}>
-                            <div className="message-item" key={index}>
+                        <div className={`message-line ${m.sender.id === user.id ? "message-mine" : ""}`} key={index}>
+                            <div className="message-item">
                                 <div>
                                     <h4>{m.sender.name}</h4>
                                 </div>

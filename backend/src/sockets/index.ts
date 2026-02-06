@@ -4,10 +4,14 @@ import { socketAuth } from "./socketAuth";
 //import userSocket from "./user.socket";
 
 export default function registerSockets(io: Server) {
-    io.on("connection", (socket) => {
-        socketAuth(io);
+    // Register socket auth middleware once, before handling connections
+    socketAuth(io);
 
-        console.log("Novo cliente conectado:", socket.id);
+    io.on("connection", (socket) => {
+        console.log("Novo cliente conectado:", socket.user.id);
+
+        // Conecta todos os usuários em uma sala própria para receber notificações
+        socket.join(socket.user.id);
 
         // módulos de eventos
         chatSocket(io, socket);

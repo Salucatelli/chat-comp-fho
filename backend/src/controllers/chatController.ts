@@ -7,14 +7,14 @@ import { ExecException } from 'child_process';
 const prisma = new PrismaClient();
 
 export const sendMessage = async (req: Request, res: Response) => {
-    const { senderId, conversarionId, message } = req.body;
+    const { senderId, conversationId, content } = req.body;
 
     try {
         const newMessage = await prisma.message.create({
             data: {
                 senderId,
-                conversationId: conversarionId,
-                content: message
+                conversationId: conversationId,
+                content
             }
         });
 
@@ -40,11 +40,21 @@ export const getAllConversations = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const contacts = await prisma.conversation.findMany({
-        select: {
-            id: true,
-            title: true,
-            isGroup: true
-        }, where: {
+        include: {
+            messages: {
+                orderBy: { sendAt: "desc" },
+                take: 1,
+                include: {
+                    sender: {
+                        select: {
+                            name: true,
+                            id: true
+                        }
+                    }
+                }
+            }
+        },
+        where: {
             participants: {
                 some: {
                     userId: userId
@@ -75,5 +85,25 @@ export const createConversation = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ message: "Conversa criada com sucesso!", conv });
+}
+
+export const getAllMessagesFromConversation = async (req: Request, res: Response) => {
+    const { conversationId } = req.params;
+
+    const messages = await prisma.message.findMany({
+        where: {
+            conversationId: conversationId
+        },
+        include: {
+            sender: {
+                select: {
+                    name: true,
+                    id: true
+                }
+            }
+        }
+    });
+
+    res.status(200).json({ message: "Mensagens obtidas com sucesso!", messages: messages });
 }
 

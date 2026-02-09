@@ -9,21 +9,24 @@ export default function chatSocket(io: Server, socket: Socket) {
     // Recebe uma mensagem enviada pelo frontend e trata ela
     socket.on('chatMessage', async (msg) => {
         console.log(msg);
-        const message = await sendMessage({ senderId: msg.sender.id, conversationId: msg.to, content: msg.message });
+        const message = await sendMessage({ senderId: msg.sender.id, conversationId: msg.to, content: msg.content });
 
         console.log("criada uma mensagem " + message);
 
-        // Pegar todos os participantes da conversa e enviar uma notificação indiviual para cada um deles
+        // Pegar todos os participantes da conversa 
         const participants = await prisma.conversationParticipant.findMany({
             where: {
                 conversationId: msg.to,
             },
         });
+
+        // Envia uma notificação indiviual para cada um dos participantes da conversa
         participants.forEach((participant) => {
             //console.log("Enviando notificação para " + participant.userId);
             io.to(participant.userId).emit("chatNotification", msg);
         });
 
+        // Envia a mensagem para o destinatário
         io.to(msg.to).emit("chatMessage", (msg), msg.sender);
     });
 

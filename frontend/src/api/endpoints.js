@@ -50,16 +50,16 @@ export async function getAllContacts() {
     return response.json();
 }
 
-export async function getSomething(url) {
+export async function getMethod(url) {
     const response = await apiFetch(url);
     //console.log(response);
     return response.json();
 }
 
-export async function postSometing(url, object) {
+export async function postMethod(url, body) {
     const response = await apiFetch(url, {
         method: "POST",
-        body: JSON.stringify(object)
+        body: JSON.stringify(body)
     });
     return response.json();
 }

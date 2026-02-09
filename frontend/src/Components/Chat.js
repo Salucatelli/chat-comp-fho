@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { socket } from "../Services/socketService";
 import '../Styles/Chat.css'
-import { getContactsService, getConversationsService, postMethod } from "../Services/chatService";
+import { getContactsService, getConversationsService, getMessagesService, sendMessageService } from "../Services/chatService";
+import { postMethod } from "../api/endpoints";
+
 
 export default function Chat({ user }) {
 
@@ -36,6 +38,7 @@ export default function Chat({ user }) {
             socket.emit("leaveConversation", currentConversation.id);
         }
         setCurrentConversation(c);
+        await getMessages(c.id);
         socket.emit("joinConversation", c.id);
     }
 
@@ -46,10 +49,25 @@ export default function Chat({ user }) {
         setConversations(c.conversations);
     }
 
+    // Atualiza a ultima mensagem de uma conversa
+    function updateLastMessage(message) {
+        const conversationId = message.conversationId ?? message.to;
+        if (!conversationId) return;
+        setConversations((prev) =>
+            prev.map((conversation) =>
+                conversation.id === conversationId
+                    ? { ...conversation, lastMessage: message }
+                    : conversation
+            )
+        );
+    }
+
 
     //=============================== TODO ========================================
-    // - Salvar as mensagens no banco de dados
-    // - Carregar as mensagens do banco de dados quando abrir um chat
+    // - OK Salvar as mensagens no banco de dados
+    // - OK Carregar as mensagens do banco de dados quando abrir um chat
+    // - Marcar mensagem como lida
+    // - Adicionar no objeto da mensagem se foi lida ou não para mostrar diferente na lista de conversas
     // - Configurar a notificação para quando não estiver com o chat aberto 
     // - Criar um menuzinho para adicionar contatos novos 
     // - Opção para criar um grupo
@@ -73,28 +91,28 @@ export default function Chat({ user }) {
 
     }, []);
 
-    // useEffect para receber mensagens e notificações
+    // useEffect para receber mensagens quando o chat está aberto
     useEffect(() => {
         const handleChatMessage = (data) => {
-
             if (data.sender.id === user.id) return;
-            console.log("mensagem recebida: ", data.message);
+
+            updateLastMessage(data);
+
             setMessages((prev) => [...prev, data]);
         };
 
         socket.on("chatMessage", handleChatMessage);
 
-        return () => {
-            socket.off("chatMessage", handleChatMessage);
-        };
+        return () => socket.off("chatMessage", handleChatMessage);
     }, [user.id]);
 
-    // useEffect para atualizar quando mudar o current conversation
+    // useEffect para receber notificações
     useEffect(() => {
         const handleNotification = (data) => {
-            //console.log(data);
-            // console.log("Id da conversa atual: ", currentConversation.id);
-            // console.log("Id da notificação: ", data.to);
+            if (data.sender.id === user.id) return;
+            console.log("notificação recebida: ", data);
+
+            updateLastMessage(data);
         }
 
         socket.on("chatNotification", handleNotification);
@@ -102,27 +120,35 @@ export default function Chat({ user }) {
     }, [currentConversation]);
 
     // Detectar que clicou no enter
-    function handleKeyPress(event) {
+    async function handleKeyPress(event) {
         if (event.key === 'Enter') {
-            sendMessage();
+            await sendMessage();
         }
     }
 
     // Enviar uma mensagem
-    function sendMessage() {
+    async function sendMessage() {
         if (messageInput === "") return;
+        let newMessage = {
+            content: messageInput,
+            to: currentConversation.id,
+            conversationId: currentConversation.id,
+            sender: user,
+        }
 
-        let newMessage = { message: messageInput, to: currentConversation.id, sender: user }
-
+        // Envia para o server a mensagem, que envia para os outros e salva no banco
         socket.emit("chatMessage", newMessage);
-        //console.log("contato: ", userContact);
+
+        updateLastMessage(newMessage);
+
         setMessages([...messages, newMessage]);
         setMessageInput("");
     }
 
     // carrega todas as mensagens de um determinado contato
-    function getMessages(c) {
-        setMessages([]);
+    async function getMessages(cId) {
+        var messages = await getMessagesService(cId);
+        setMessages(messages.messages);
     }
 
     // async function changeContact(c) {
@@ -152,7 +178,11 @@ export default function Chat({ user }) {
                 <h2>Conversas</h2>
                 <div className="contact-list">
                     {conversations.map((c) =>
-                        <div className="contact-item" key={c.id} onClick={() => selectConversation(c)}>{c.title}</div>
+                        <div className="contact-item" key={c.id} onClick={() => selectConversation(c)}>
+                            <h4>{c.title}</h4>
+
+                            <span>{(c.lastMessage || (c.messages && c.messages[0])) ? (c.lastMessage || c.messages[0]).content : ""}</span>
+                        </div>
                     )}
                 </div>
             </div>
@@ -185,7 +215,7 @@ export default function Chat({ user }) {
                                     <h4>{m.sender.name}</h4>
                                 </div>
                                 <div>
-                                    <p>{m.message}</p>
+                                    <p>{m.content}</p>
                                 </div>
                             </div>
                         </div>

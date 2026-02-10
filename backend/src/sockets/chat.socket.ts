@@ -48,4 +48,41 @@ export default function chatSocket(io: Server, socket: Socket) {
         socket.leave(conversationId);
         console.log("Leaved conversation " + conversationId);
     });
+
+    // Marca as mensagens de uma conversa como lida para um usuário
+    socket.on("markMessagesAsRead", async (d: object) => {
+
+        try {
+            const { conversationId, userId } = d as { conversationId: string; userId: string };
+
+            // Pega as mensagens da conversa que ainda não foram lidas
+            const messagesToRead = await prisma.message.findMany({
+                where: {
+                    conversationId,
+                    senderId: { not: userId },
+                    messageRead: {
+                        none: {
+                            userId: userId
+                        }
+                    }
+                }
+            });
+
+            // console.log("mensagens para ler: " + messagesToRead);
+
+            // Cria registros de leitura para as mensagens
+            await prisma.messageRead.createMany({
+                data: messagesToRead.map((message) => ({
+                    messageId: message.id,
+                    userId: userId
+                }))
+            });
+
+            return { message: "Mensagens marcadas como lidas com sucesso!", success: true };
+        }
+        catch (e) {
+            console.log(e);
+            return { message: "Deu um erro aqui", success: false };
+        }
+    })
 } ''

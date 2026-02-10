@@ -27,7 +27,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
 
     jwt.verify(token, process.env.JWT_SECRET as string, async (err, decoded) => {
         if (err) {
-            console.error(err);
+            console.error("não logado");
             return res.sendStatus(401); // Unauthorized
         }
 

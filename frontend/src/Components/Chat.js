@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { socket } from "../Services/socketService";
 import '../Styles/Chat.css'
 import { getContactsService, getConversationsService, getMessagesService, sendMessageService } from "../Services/chatService";
@@ -6,6 +6,7 @@ import { postMethod } from "../api/endpoints";
 
 
 export default function Chat({ user }) {
+    const messagesEndRef = useRef(null);
 
     const [currentConversation, setCurrentConversation] = useState({});
     const [messages, setMessages] = useState([]);
@@ -33,12 +34,32 @@ export default function Chat({ user }) {
         }
     }
 
+    /* 
+    MELHORIA FUTURA:
+        Usar um metodo post HTTP para marcar as mensagens como lidas e salvar isso no backend, e ao mesmo tempo usar um socket.emit para avisar os outros usuários que as mensagens foram lidas
+    */
+
+    // Executado quando abre uma nova conversa
     async function selectConversation(c) {
-        if (currentConversation != null) {
+        if (currentConversation.length > 0) {
             socket.emit("leaveConversation", currentConversation.id);
         }
+
         setCurrentConversation(c);
         await getMessages(c.id);
+
+        // Aqui ele tira as mensagens não lidas da conversa quando você abre ela
+        setConversations((prev) =>
+            prev.map((conversation) =>
+                conversation.id === c.id
+                    ? { ...conversation, _count: { messages: 0 } }
+                    : conversation
+            )
+        );
+
+        // Marcar as mensagens como lidas
+        socket.emit("markMessagesAsRead", { conversationId: c.id, userId: user.id });
+
         socket.emit("joinConversation", c.id);
     }
 
@@ -53,22 +74,63 @@ export default function Chat({ user }) {
     function updateLastMessage(message) {
         const conversationId = message.conversationId ?? message.to;
         if (!conversationId) return;
+
+        // Para saber se marca a mensagem como não lida ou não
+        const unreadNumber = currentConversation.id === conversationId ? 0 : 1;
+
         setConversations((prev) =>
             prev.map((conversation) =>
                 conversation.id === conversationId
-                    ? { ...conversation, lastMessage: message }
+                    ? { ...conversation, lastMessage: message, _count: { messages: conversation._count.messages + unreadNumber } }
                     : conversation
             )
         );
+    }
+
+    // Detectar que clicou no enter
+    async function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            await sendMessage();
+        }
+    }
+
+    // Enviar uma mensagem
+    async function sendMessage() {
+        if (messageInput === "") return;
+        let newMessage = {
+            content: messageInput,
+            to: currentConversation.id,
+            conversationId: currentConversation.id,
+            sender: user,
+        }
+
+        // Envia para o server a mensagem, que envia para os outros e salva no banco
+        socket.emit("chatMessage", newMessage);
+
+        updateLastMessage(newMessage);
+
+        setMessages([...messages, newMessage]);
+        setMessageInput("");
+    }
+
+    // carrega todas as mensagens de um determinado contato
+    async function getMessages(cId) {
+        var messages = await getMessagesService(cId);
+        setMessages(messages.messages);
+    }
+
+    function checkUnreadMessages(c) {
+        return c._count.messages > 0 ? "unread" : "";
     }
 
 
     //=============================== TODO ========================================
     // - OK Salvar as mensagens no banco de dados
     // - OK Carregar as mensagens do banco de dados quando abrir um chat
-    // - Marcar mensagem como lida
+    // - OK Marcar mensagem como lida
+    // - Deixar bonitinho uma badge para mostrar mensagens não lidas na lista de conversas
     // - Adicionar no objeto da mensagem se foi lida ou não para mostrar diferente na lista de conversas
-    // - Configurar a notificação para quando não estiver com o chat aberto 
+    // - QUASE Configurar a notificação para quando não estiver com o chat aberto 
     // - Criar um menuzinho para adicionar contatos novos 
     // - Opção para criar um grupo
     //=============================================================================
@@ -106,11 +168,11 @@ export default function Chat({ user }) {
         return () => socket.off("chatMessage", handleChatMessage);
     }, [user.id]);
 
-    // useEffect para receber notificações
+    // useEffect para receber notificações quando chat não está aberto
     useEffect(() => {
         const handleNotification = (data) => {
             if (data.sender.id === user.id) return;
-            console.log("notificação recebida: ", data);
+            //console.log("notificação recebida: ", data);
 
             updateLastMessage(data);
         }
@@ -119,37 +181,10 @@ export default function Chat({ user }) {
         return () => socket.off("chatNotification", handleNotification);
     }, [currentConversation]);
 
-    // Detectar que clicou no enter
-    async function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            await sendMessage();
-        }
-    }
-
-    // Enviar uma mensagem
-    async function sendMessage() {
-        if (messageInput === "") return;
-        let newMessage = {
-            content: messageInput,
-            to: currentConversation.id,
-            conversationId: currentConversation.id,
-            sender: user,
-        }
-
-        // Envia para o server a mensagem, que envia para os outros e salva no banco
-        socket.emit("chatMessage", newMessage);
-
-        updateLastMessage(newMessage);
-
-        setMessages([...messages, newMessage]);
-        setMessageInput("");
-    }
-
-    // carrega todas as mensagens de um determinado contato
-    async function getMessages(cId) {
-        var messages = await getMessagesService(cId);
-        setMessages(messages.messages);
-    }
+    // useEffect para scrollar para baixo quando abrir uma conversa
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     // async function changeContact(c) {
     //     // const conversa = conversations.find(conversation => conversation.id === c.id);
@@ -178,7 +213,7 @@ export default function Chat({ user }) {
                 <h2>Conversas</h2>
                 <div className="contact-list">
                     {conversations.map((c) =>
-                        <div className="contact-item" key={c.id} onClick={() => selectConversation(c)}>
+                        <div className={`contact-item ${checkUnreadMessages(c)}`} key={c.id} onClick={() => selectConversation(c)}>
                             <h4>{c.title}</h4>
 
                             <span>{(c.lastMessage || (c.messages && c.messages[0])) ? (c.lastMessage || c.messages[0]).content : ""}</span>
@@ -220,6 +255,7 @@ export default function Chat({ user }) {
                             </div>
                         </div>
                     )}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 <div className="input-field">
@@ -237,6 +273,7 @@ export default function Chat({ user }) {
                 </div>
             </div>
         ) : <div><h3>Selecione um contato</h3></div>}
+        {/* elemento invisível para scroll */}
 
     </div>)
 }

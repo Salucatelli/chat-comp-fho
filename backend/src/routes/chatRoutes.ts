@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllContacts, sendMessage, getAllConversations, createConversation, getAllMessagesFromConversation } from "../controllers/chatController";
+import { getAllContacts, sendMessage, getAllConversations, createConversation, getAllMessagesFromConversation, setmessageAsRead } from "../controllers/chatController";
 
 const router = Router();
 
@@ -9,6 +9,7 @@ router.get("/getMessages/:conversationId", getAllMessagesFromConversation);
 
 router.post("/sendMessage", sendMessage);
 router.post("/createConversation", createConversation);
+router.post("/setMessageAsRead", setmessageAsRead);
 
 
 export default router;

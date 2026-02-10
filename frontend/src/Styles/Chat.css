@@ -81,3 +81,7 @@ background-color: var(--bg-surface-hover);
     justify-content: flex-end;
     /* flex-direction: row-reverse; */
 }
+
+.unread{
+    background-color: var(--bg-surface-hover);
+}

@@ -40,28 +40,38 @@ export const getAllConversations = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const contacts = await prisma.conversation.findMany({
+        where: {
+            participants: {
+                some: { userId }
+            }
+        },
         include: {
             messages: {
                 orderBy: { sendAt: "desc" },
                 take: 1,
                 include: {
                     sender: {
-                        select: {
-                            name: true,
-                            id: true
+                        select: { id: true, name: true }
+                    }
+                }
+            },
+            _count: {
+                select: {
+                    messages: {
+                        where: {
+                            senderId: { not: userId }, // não contar mensagens do próprio usuário
+                            messageRead: {
+                                none: {
+                                    userId
+                                }
+                            }
                         }
                     }
                 }
             }
-        },
-        where: {
-            participants: {
-                some: {
-                    userId: userId
-                }
-            }
         }
-    })
+    });
+
 
     res.status(200).json({ message: "Conversas obtidos com sucesso!", conversations: contacts });
 }
@@ -107,3 +117,8 @@ export const getAllMessagesFromConversation = async (req: Request, res: Response
     res.status(200).json({ message: "Mensagens obtidas com sucesso!", messages: messages });
 }
 
+export const setmessageAsRead = async (req: Request, res: Response) => {
+    const { messageId, userId } = req.body;
+
+    res.status(200).json({ message: "Mensagem marcada como lida com sucesso!" });
+}

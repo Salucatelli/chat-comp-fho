@@ -5,9 +5,10 @@
   --color-primary-active: #1d4ed8;
 
   /* ===== Backgrounds ===== */
-  --bg-body: #0f172a;   /* Fundo geral (azul bem escuro) */
-  --bg-surface: #020617;   /* Cards, modais */
-  --bg-surface-hover: #020617;
+  /* --bg-body: #0f172a;   Fundo geral (azul bem escuro) */
+  --bg-body: #161717;
+  --bg-surface: #1D1F1F;   /* Cards, modais */
+  --bg-surface-hover: #2E2F2F;
   --bg-elevated: #1e293b;   /* Hover / destaque */
 
   /* ===== Text ===== */

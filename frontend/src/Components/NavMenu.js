@@ -12,7 +12,7 @@ export default function NavMenu() {
     return (
         <div className="main-div">
             <div className="title-div">
-                <h2>Título</h2>
+                <h2>dsafsdf</h2>
             </div>
 
             <div className="right-div">

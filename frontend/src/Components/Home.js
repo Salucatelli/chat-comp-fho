@@ -16,7 +16,7 @@ export default function Home() {
         <div>
             <div className="main-div">
                 <div className="title-div">
-                    <h2>Home da página</h2>
+                    <img src="/kadu5.png" alt="logo" width="60px" className="logo-image" />
                 </div>
 
                 {!user ? (

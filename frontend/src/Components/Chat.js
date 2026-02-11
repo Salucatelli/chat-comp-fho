@@ -6,6 +6,7 @@ import { postMethod } from "../api/endpoints";
 
 
 export default function Chat({ user }) {
+    // Para scrollar até o fim das mensagens automaticamente
     const messagesEndRef = useRef(null);
 
     const [currentConversation, setCurrentConversation] = useState({});
@@ -14,11 +15,13 @@ export default function Chat({ user }) {
     const [contacts, setContacts] = useState([]);
     const [conversations, setConversations] = useState([]);
 
+    // Busca todos os contatos no banco de dados 
     async function getContacts() {
         var c = (await getContactsService());
         setContacts(c.contacts.filter(c => c.id !== user.id));
     }
 
+    // Adiciona um contato, criando uma conversa
     async function addContact(c) {
         const conversa = conversations.find(conversation => conversation.id === c.id);
 
@@ -125,9 +128,13 @@ export default function Chat({ user }) {
 
 
     //=============================== TODO ========================================
+
+    // - OK Corrigir um bug que quando faço login, ele não conecta no socket automaticamente, preciso dar f5
+
     // - OK Salvar as mensagens no banco de dados
     // - OK Carregar as mensagens do banco de dados quando abrir um chat
     // - OK Marcar mensagem como lida
+    // - Fazer um menuzinho bonitinho no canto direito para o usuário com foto e um link para perfil
     // - Deixar bonitinho uma badge para mostrar mensagens não lidas na lista de conversas
     // - Adicionar no objeto da mensagem se foi lida ou não para mostrar diferente na lista de conversas
     // - QUASE Configurar a notificação para quando não estiver com o chat aberto 
@@ -138,8 +145,12 @@ export default function Chat({ user }) {
 
     // useEffect para conectar ao socket e carregar conversas
     useEffect(() => {
+        if (!user) return;
+
         getContacts();
         getConversations();
+
+        socket.auth = { token: localStorage.getItem("token") };
 
         socket.connect();
 
@@ -151,7 +162,7 @@ export default function Chat({ user }) {
             console.log("desconectado"); // false
         });
 
-    }, []);
+    }, [user]);
 
     // useEffect para receber mensagens quando o chat está aberto
     useEffect(() => {

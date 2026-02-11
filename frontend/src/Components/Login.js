@@ -11,8 +11,14 @@ export default function Login() {
     const navigate = useNavigate();
 
     // Aqui ele vai tentar fazer o login, se conseguir, manda para profile, se não da mensagem de erro
-    async function useHandleLogin(formData) {
-        const response = await tryLogin(formData.get("email"), formData.get("password"));
+    async function useHandleLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        const response = await tryLogin(
+            formData.get("email"),
+            formData.get("password")
+        );
 
         setError("");
 
@@ -35,7 +41,7 @@ export default function Login() {
             <div className="login-card">
                 <h1>Fazer Login</h1>
 
-                <form action={useHandleLogin} className="input-form">
+                <form onSubmit={useHandleLogin} className="input-form">
                     <input type="text" name="email" className="form-control" placeholder="Email" />
                     <input type="password" name="password" className="form-control" placeholder="Senha" />
                     <span className="text-danger">{error}</span>

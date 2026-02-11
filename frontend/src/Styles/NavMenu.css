@@ -19,3 +19,7 @@
 .main-div a{
     text-decoration: none;
 }
+
+.leaveLink{
+    cursor: pointer;
+}

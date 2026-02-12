@@ -15,6 +15,8 @@ export default function Chat({ user }) {
     const [contacts, setContacts] = useState([]);
     const [conversations, setConversations] = useState([]);
 
+    const audioUnlockedRef = useRef(false);
+
     // Busca todos os contatos no banco de dados 
     async function getContacts() {
         var c = (await getContactsService());
@@ -156,6 +158,40 @@ export default function Chat({ user }) {
     // - Opção para criar um grupo
     //=============================================================================
 
+    // useEffect para o audio
+    useEffect(() => {
+        if (!user) return;
+
+        const unlockAudioOnce = () => {
+            if (audioUnlockedRef.current) return;
+
+            const audio = new Audio("/penguin_notification.wav");
+
+            audio
+                .play()
+                .then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audioUnlockedRef.current = true;
+                    console.log("🔓 Áudio desbloqueado com sucesso");
+                })
+                .catch((err) => {
+                    console.error("❌ Falha ao desbloquear áudio", err);
+                });
+        };
+
+        // 👇 ESTES EVENTOS FUNCIONAM
+        document.addEventListener("pointerdown", unlockAudioOnce, { once: true });
+        document.addEventListener("keydown", unlockAudioOnce, { once: true });
+        document.addEventListener("touchstart", unlockAudioOnce, { once: true });
+
+        return () => {
+            document.removeEventListener("pointerdown", unlockAudioOnce);
+            document.removeEventListener("keydown", unlockAudioOnce);
+            document.removeEventListener("touchstart", unlockAudioOnce);
+        };
+    }, [user]);
+
 
     // useEffect para conectar ao socket e carregar conversas
     useEffect(() => {
@@ -198,6 +234,13 @@ export default function Chat({ user }) {
         const handleNotification = (data) => {
             if (data.sender.id === user.id) return;
             if (data.conversationId === currentConversation.id) return;
+
+            const notificationSound = new Audio("/penguin_notification.wav");
+
+            if (audioUnlockedRef.current) {
+                notificationSound.currentTime = 0;
+                notificationSound.play();
+            }
 
             updateLastMessage(data);
         }
